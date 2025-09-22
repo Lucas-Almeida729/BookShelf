@@ -2,10 +2,16 @@
 "use client";
 
 import BookForm from "@/components/BookForm";
-import { useBooks } from "@/context/BookContext"; // Use o hook
+import { useBooks } from "@/context/BookContext";
 
-export default function EditarLivroPage({ params }: { params: { id: string } }) {
-  const { getBookById } = useBooks(); // Pega a função para buscar o livro
+// 1. Definimos um tipo explícito para as propriedades da página
+type PageProps = {
+  params: { id: string };
+};
+
+// 2. Usamos o tipo 'PageProps' na definição da função
+export default function EditarLivroPage({ params }: PageProps) {
+  const { getBookById } = useBooks();
   const book = getBookById(params.id);
 
   if (!book) {
