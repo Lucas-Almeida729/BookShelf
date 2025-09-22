@@ -33,7 +33,7 @@ export const initialBooks: Book[] = [
     year: 1949, 
     pages: 328,
     genre: 'Ficção Científica', 
-    status: 'QUERO_LER', 
+    status: 'ABANDONADO', 
     rating: 3, // Ou undefined
     synopsis: 'Um romance distópico que retrata a vida na Oceânia, um superestado totalitário onde o Partido, liderado pelo Grande Irmão, exerce controlo absoluto sobre a população através de vigilância constante e manipulação da verdade. A história segue Winston Smith, um funcionário do Partido que começa a questionar o regime e tenta rebelar-se, enfrentando a perda da privacidade e a supressão da individualidade. A obra é um alerta contra os perigos do totalitarismo, da censura e da perda da liberdade individual. ',
     cover: 'https://cdn.awsli.com.br/1304/1304678/produto/85900220/61b06e91a9.jpg' 

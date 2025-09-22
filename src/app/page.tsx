@@ -15,7 +15,7 @@ export default function HomePage() {
 
   return (
     <main className="container mx-auto p-4 md:p-8">
-      <h1 className="text-3xl font-bold mb-8 text-center">Meu Dashboard</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center">Meus Livros</h1>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {/* Card para Total de Livros */}
@@ -24,7 +24,8 @@ export default function HomePage() {
             title="Total de Livros"
             count={totalLivros}
             Icon={Library}
-            className="hover:border-blue-500"
+            // className="hover:border-blue-500"
+            className="hover:border-blue-500 hover:bg-blue-50"
           />
         </Link>
 
@@ -34,7 +35,7 @@ export default function HomePage() {
             title="Lendo Atualmente"
             count={livrosLendo}
             Icon={PlayCircle}
-            className="hover:border-yellow-500"
+            className="hover:border-yellow-500 hover:bg-yellow-50"
           />
         </Link>
 
@@ -44,7 +45,7 @@ export default function HomePage() {
             title="Livros Finalizados"
             count={livrosFinalizados}
             Icon={Book}
-            className="hover:border-green-500"
+            className="hover:border-green-500 hover:bg-green-50"
           />
         </Link>
         
@@ -54,7 +55,7 @@ export default function HomePage() {
             title="Pausados"
             count={livrosPausados}
             Icon={PauseCircle}
-            className="hover:border-orange-500"
+            className="hover:border-orange-500 hover:bg-orange-50"
           />
         </Link>
 
@@ -64,7 +65,7 @@ export default function HomePage() {
             title="Abandonados"
             count={livrosAbandonados}
             Icon={XCircle}
-            className="hover:border-red-500"
+            className="hover:border-red-500 hover:bg-red-50"
           />
         </Link>
       </div>
