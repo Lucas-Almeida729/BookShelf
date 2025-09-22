@@ -24,10 +24,9 @@ export default function Navbar() {
           <Button asChild variant="ghost" className={pathname.startsWith("/biblioteca") || pathname.startsWith("/livros") ? "text-blue-300" : "text-white hover:text-blue-200"}>
             <Link href="/biblioteca">Biblioteca</Link>
           </Button>
-          {/* Futuramente, pode ter um botão para adicionar livro aqui */}
-          {/* <Button asChild variant="secondary">
+          {<Button asChild variant="secondary">
             <Link href="/livros/novo">Adicionar Livro</Link>
-          </Button> */}
+          </Button>}
         </div>
       </div>
     </nav>

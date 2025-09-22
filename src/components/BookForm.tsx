@@ -1,23 +1,20 @@
 // src/components/BookForm.tsx
-"use client"; // Este componente precisa de interatividade (useState), então marcamos como "client component".
+"use client";
 
 import { useState } from "react";
-import { Book, statuses, genres } from "@/types/book"; // Importa nossos tipos
+import { Book, statuses, genres } from "@/types/book";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import StarRating from "./StarRating"; // Usaremos para a avaliação
 
-// Definimos as props: o formulário pode, opcionalmente, receber os dados de um livro para edição.
 interface BookFormProps {
   initialData?: Book;
 }
 
 export default function BookForm({ initialData }: BookFormProps) {
-  // Criamos um "estado" para guardar todos os dados do formulário.
-  // Se 'initialData' for fornecido (modo edição), usamos esses dados.
-  // Se não (modo adição), usamos valores padrão.
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
     author: initialData?.author || '',
@@ -25,63 +22,119 @@ export default function BookForm({ initialData }: BookFormProps) {
     pages: initialData?.pages || undefined,
     cover: initialData?.cover || '',
     genre: initialData?.genre || undefined,
-    status: initialData?.status || undefined,
+    status: initialData?.status || 'QUERO_LER', // Valor padrão
     rating: initialData?.rating || 0,
     synopsis: initialData?.synopsis || ''
   });
 
-  // Função genérica para lidar com a mudança nos inputs de texto e número
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
-    // Atualiza o estado do formulário, mantendo os dados anteriores (...prev)
     setFormData(prev => ({
       ...prev,
       [name]: type === 'number' ? parseInt(value) || undefined : value,
     }));
   };
 
-  // Função para lidar com a mudança nos selects (gênero e status)
   const handleSelectChange = (name: 'genre' | 'status') => (value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
-  
-  // Função que é chamada quando o formulário é enviado
+
+  // Função para lidar com a mudança da avaliação por estrelas
+  const handleRatingChange = (newRating: number) => {
+    setFormData(prev => ({...prev, rating: newRating}));
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault(); // Impede o recarregamento padrão da página
-    // No futuro, aqui você enviaria os dados para um banco de dados.
-    // Por enquanto, vamos apenas exibir os dados no console.
+    e.preventDefault();
     console.log("Dados do livro salvos:", formData);
     alert("Livro salvo com sucesso! (Verifique o console do navegador com F12)");
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl mx-auto">
-      {/* Campo Título */}
-      <div className="space-y-2">
-        <Label htmlFor="title">Título *</Label>
-        <Input id="title" name="title" value={formData.title} onChange={handleChange} required />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Campo Título */}
+        <div className="space-y-2">
+          <Label htmlFor="title">Título *</Label>
+          <Input id="title" name="title" value={formData.title} onChange={handleChange} required />
+        </div>
+
+        {/* Campo Autor */}
+        <div className="space-y-2">
+          <Label htmlFor="author">Autor *</Label>
+          <Input id="author" name="author" value={formData.author} onChange={handleChange} required />
+        </div>
       </div>
 
-      {/* Campo Autor */}
+      {/* URL da Capa */}
       <div className="space-y-2">
-        <Label htmlFor="author">Autor *</Label>
-        <Input id="author" name="author" value={formData.author} onChange={handleChange} required />
+        <Label htmlFor="cover">URL da Capa</Label>
+        <Input id="cover" name="cover" placeholder="https://exemplo.com/capa.jpg" value={formData.cover} onChange={handleChange} />
       </div>
 
-      {/* Campo Gênero */}
-      <div className="space-y-2">
-        <Label htmlFor="genre">Gênero</Label>
-        <Select name="genre" onValueChange={handleSelectChange('genre')} value={formData.genre}>
-          <SelectTrigger>
-            <SelectValue placeholder="Selecione um gênero" />
-          </SelectTrigger>
-          <SelectContent>
-            {genres.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}
-          </SelectContent>
-        </Select>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Campo Ano */}
+        <div className="space-y-2">
+          <Label htmlFor="year">Ano de Publicação</Label>
+          <Input id="year" name="year" type="number" value={formData.year || ''} onChange={handleChange} />
+        </div>
+
+        {/* Campo Páginas */}
+        <div className="space-y-2">
+          <Label htmlFor="pages">Nº de Páginas</Label>
+          <Input id="pages" name="pages" type="number" value={formData.pages || ''} onChange={handleChange} />
+        </div>
       </div>
 
-      {/* Outros campos podem ser adicionados aqui seguindo o mesmo padrão (Ano, Páginas, Capa, etc.) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Campo Gênero */}
+        <div className="space-y-2">
+          <Label htmlFor="genre">Gênero</Label>
+          <Select name="genre" onValueChange={handleSelectChange('genre')} value={formData.genre}>
+            <SelectTrigger>
+              <SelectValue placeholder="Selecione um gênero" />
+            </SelectTrigger>
+            <SelectContent>
+              {genres.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Campo Status */}
+        <div className="space-y-2">
+          <Label htmlFor="status">Status</Label>
+          <Select name="status" onValueChange={handleSelectChange('status')} value={formData.status}>
+            <SelectTrigger>
+              <SelectValue placeholder="Selecione o status" />
+            </SelectTrigger>
+            <SelectContent>
+              {statuses.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* Campo Sinopse */}
+      <div className="space-y-2">
+        <Label htmlFor="synopsis">Sinopse</Label>
+        <Textarea id="synopsis" name="synopsis" value={formData.synopsis} onChange={handleChange} rows={5} />
+      </div>
+
+      {/* Campo Avaliação */}
+      <div className="space-y-2">
+          <Label>Avaliação</Label>
+          <div className="flex items-center gap-2">
+              {/* Clicar em uma estrela define a avaliação */}
+              {[1, 2, 3, 4, 5].map((star) => (
+                  <button type="button" key={star} onClick={() => handleRatingChange(star)}>
+                      <StarRating rating={formData.rating} maxRating={1} size={24} />
+                  </button>
+              ))}
+              {formData.rating > 0 && (
+                  <Button variant="ghost" size="sm" onClick={() => handleRatingChange(0)}>Limpar</Button>
+              )}
+          </div>
+      </div>
 
       <Button type="submit" className="w-full">
         {initialData ? 'Atualizar Livro' : 'Adicionar Livro'}
