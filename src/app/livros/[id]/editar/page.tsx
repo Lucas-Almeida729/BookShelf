@@ -1,18 +1,23 @@
 // src/app/livros/[id]/editar/page.tsx
 "use client";
 
+import { use } from 'react'; // 1. Importe o 'use' do React
 import BookForm from "@/components/BookForm";
 import { useBooks } from "@/context/BookContext";
 
-// 1. Definimos um tipo explícito para as propriedades da página
+// 2. A propriedade 'params' agora é tipada como uma Promise
 type PageProps = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
-// 2. Usamos o tipo 'PageProps' na definição da função
 export default function EditarLivroPage({ params }: PageProps) {
+  // 3. Use o hook React.use() para extrair o valor da Promise
+  const resolvedParams = use(params);
+  
   const { getBookById } = useBooks();
-  const book = getBookById(params.id);
+  
+  // 4. Use o valor resolvido para buscar o livro
+  const book = getBookById(resolvedParams.id);
 
   if (!book) {
     return <div className="text-center mt-10">Livro não encontrado!</div>;

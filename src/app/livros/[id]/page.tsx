@@ -1,16 +1,27 @@
 // src/app/livros/[id]/page.tsx
 "use client";
 
+import { use } from 'react'; // 1. Importe o 'use' do React
 import { Badge } from "@/components/ui/badge";
 import StarRating from "@/components/StarRating";
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
-import Image from 'next/image'; // 1. Importe o Image
+import Image from 'next/image';
 import { useBooks } from "@/context/BookContext";
 
-export default function DetalhesLivroPage({ params }: { params: { id: string } }) {
+// 2. Defina o tipo de props com 'params' como uma Promise
+type PageProps = {
+  params: Promise<{ id: string }>;
+};
+
+export default function DetalhesLivroPage({ params }: PageProps) {
+  // 3. Use o hook para resolver a Promise
+  const resolvedParams = use(params);
+
   const { getBookById } = useBooks();
-  const book = getBookById(params.id);
+  
+  // 4. Use o valor resolvido
+  const book = getBookById(resolvedParams.id);
 
   if (!book) {
     return <div className="text-center mt-10">Livro não encontrado!</div>;
@@ -20,14 +31,13 @@ export default function DetalhesLivroPage({ params }: { params: { id: string } }
     <main className="container mx-auto p-4 md:p-8">
       <div className="grid md:grid-cols-3 gap-8">
         <div className="md:col-span-1">
-          {/* 2. Substitua a tag <img> */}
-          <div className="relative w-full aspect-[2/3] shadow-lg">
+          <div className="relative w-full aspect-[2/3] shadow-lg bg-gray-100 dark:bg-gray-800 rounded-lg">
             <Image
               src={book.cover || 'https://via.placeholder.com/300x400.png?text=Sem+Capa'}
               alt={`Capa do livro ${book.title}`}
               fill
-              style={{ objectFit: 'cover' }}
-              className="rounded-lg"
+              style={{ objectFit: 'contain' }}
+              className="rounded-lg p-4"
             />
           </div>
           <div className="mt-4 flex gap-2">

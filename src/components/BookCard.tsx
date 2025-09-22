@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 import { Badge } from "@/components/ui/badge";
 import BookActions from "./BookActions"; 
 import StarRating from "./StarRating";
-import Image from "next/image"; // 1. Importe o Image
+import Image from "next/image";
 
 interface BookCardProps {
   book: Book;
@@ -13,14 +13,15 @@ interface BookCardProps {
 export default function BookCard({ book }: BookCardProps) {
   return (
     <Card className="flex flex-col overflow-hidden transition-transform duration-300 hover:scale-105 hover:shadow-lg">
-      {/* 2. Substitua a tag <img> pela tag <Image /> */}
-      <div className="relative w-full h-48"> {/* Um container para a imagem */}
+      {/* 1. Reduzimos a altura do container da imagem para h-40 */}
+      <div className="relative w-full h-80 bg-gray-100 dark:bg-gray-800 rounded-t-md"> 
         <Image 
           src={book.cover || 'https://via.placeholder.com/300x400.png?text=Sem+Capa'} 
           alt={`Capa do livro ${book.title}`} 
-          fill // Preenche o container
-          style={{ objectFit: 'cover' }} // Garante que a imagem cubra o espaço
-          className="rounded-t-md" 
+          fill 
+          // 2. Mudamos de 'cover' para 'contain' para mostrar a imagem inteira
+          style={{ objectFit: 'contain' }} 
+          className="rounded-t-md p-2" // Adicionamos um padding para a imagem não colar nas bordas
         />
       </div>
       <div className="p-4 flex flex-col flex-grow">
@@ -31,7 +32,7 @@ export default function BookCard({ book }: BookCardProps) {
         <CardContent className="p-0 mt-4 flex-grow">
           {book.genre && <Badge className="mr-2">{book.genre}</Badge>}
           {book.year && <span className="text-sm text-muted-foreground">{book.year}</span>}
-
+          
           {book.rating !== undefined && book.rating > 0 && (
             <div className="mt-2">
               <StarRating rating={book.rating} />
