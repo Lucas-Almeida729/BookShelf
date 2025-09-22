@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Star } from "lucide-react";
 // 1. Importe os componentes do Dialog
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter} from "@/components/ui/dialog";
 
 interface BookFormProps {
   initialData?: Book;
@@ -47,7 +47,7 @@ export default function BookForm({ initialData }: BookFormProps) {
   };
 
   const handleSelectChange = (name: 'genre' | 'status') => (value: string) => {
-    setFormData(prev => ({ ...prev, [name]: value as any }));
+  setFormData(prev => ({ ...prev, [name]: value as Genre | Status }));
   };
 
   const handleRatingChange = (newRating: number) => {

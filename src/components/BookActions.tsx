@@ -4,7 +4,7 @@
 import { useState } from "react"; // Importa o useState
 import { useBooks } from "@/context/BookContext";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger, DialogClose } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger} from "@/components/ui/dialog";
 import Link from 'next/link';
 import { useRouter } from "next/navigation";
 
