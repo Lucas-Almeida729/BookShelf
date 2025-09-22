@@ -1,29 +1,43 @@
 // src/app/biblioteca/page.tsx
 "use client"; 
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from 'next/navigation'; // Importa o hook
 import { initialBooks } from "@/lib/mock-data";
 import BookCard from "@/components/BookCard";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-// Importe os gêneros e os componentes Select
-import { genres } from "@/types/book"; 
+import { genres, Status } from "@/types/book"; 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function BibliotecaPage() {
-  const [searchTerm, setSearchTerm] = useState(""); 
-  const [selectedGenre, setSelectedGenre] = useState<string | undefined>(undefined); // <-- Novo estado para o gênero
+  const searchParams = useSearchParams(); // Hook para ler parâmetros da URL
+  const statusFromUrl = searchParams.get('status') as Status | null;
 
-  // Lógica de filtro combinada: busca por termo E filtro por gênero
+  const [searchTerm, setSearchTerm] = useState(""); 
+  const [selectedGenre, setSelectedGenre] = useState<string | undefined>(undefined);
+  // Novo estado para o filtro de status, inicializado com o valor da URL
+  const [selectedStatus, setSelectedStatus] = useState<Status | undefined>(statusFromUrl || undefined);
+
+  // Efeito para atualizar o filtro de status se a URL mudar
+  useEffect(() => {
+    setSelectedStatus(statusFromUrl || undefined);
+  }, [statusFromUrl]);
+  
+  // Lógica de filtro combinada: busca, gênero E status
   const filteredBooks = initialBooks.filter(book => {
     const matchesSearchTerm = 
       book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       book.author.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesGenre = 
-      selectedGenre ? book.genre === selectedGenre : true; // Se nenhum gênero selecionado, todos passam
+      selectedGenre ? book.genre === selectedGenre : true;
 
-    return matchesSearchTerm && matchesGenre;
+    // Novo filtro por status
+    const matchesStatus =
+      selectedStatus ? book.status === selectedStatus : true;
+
+    return matchesSearchTerm && matchesGenre && matchesStatus;
   });
 
   return (
@@ -47,12 +61,12 @@ export default function BibliotecaPage() {
         {/* Filtro por Gênero */}
         <div className="w-full md:w-1/3">
           <Label htmlFor="genre-filter" className="sr-only">Filtrar por Gênero</Label>
-          <Select onValueChange={setSelectedGenre} value={selectedGenre}>
+          <Select onValueChange={(value) => setSelectedGenre(value === 'undefined' ? undefined : value)} value={selectedGenre}>
             <SelectTrigger id="genre-filter">
               <SelectValue placeholder="Filtrar por gênero" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="undefined">Todos os Gêneros</SelectItem> {/* Opção para remover filtro */}
+              <SelectItem value="undefined">Todos os Gêneros</SelectItem>
               {genres.map(g => (
                 <SelectItem key={g} value={g}>{g}</SelectItem>
               ))}
@@ -61,14 +75,19 @@ export default function BibliotecaPage() {
         </div>
       </div>
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {filteredBooks.map(book => (
-          <BookCard 
-            key={book.id} 
-            book={book} 
-          />
-        ))}
-      </div>
+      {/* Mensagem se nenhum livro for encontrado */}
+      {filteredBooks.length === 0 ? (
+        <p className="text-center text-gray-500 mt-12">Nenhum livro encontrado com os filtros atuais.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {filteredBooks.map(book => (
+            <BookCard 
+              key={book.id} 
+              book={book} 
+            />
+          ))}
+        </div>
+      )}
     </main>
   );
 }
