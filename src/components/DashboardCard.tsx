@@ -7,11 +7,23 @@ interface DashboardCardProps {
   count: number;
   Icon: LucideIcon;
   className?: string;
+  animationDelay?: number;
 }
 
-export default function DashboardCard({ title, count, Icon, className }: DashboardCardProps) {
+export default function DashboardCard({
+  title,
+  count,
+  Icon,
+  className,
+  animationDelay = 0,
+}: DashboardCardProps) {
   return (
-    <Card className={`transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${className}`}>
+    <Card
+      className={`transition-all duration-300 hover:shadow-xl hover:-translate-y-1 animate-in fade-in-0 slide-in-from-bottom-4 ${className}`}
+      style={{
+        animationDelay: `${animationDelay}ms`,
+      }}
+    >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         <Icon className="h-4 w-4 text-muted-foreground" />

@@ -2,8 +2,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import Navbar from "@/components/Navbar";
-import { BookProvider } from "@/context/BookContext"; // 1. Importe o provider
+import { BookProvider } from "@/context/BookContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,13 +19,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR">
-      <body className={inter.className}>
-        {/* 2. Envolva a aplicação com o BookProvider */}
-        <BookProvider> 
-          <Navbar />
-          {children}
-        </BookProvider>
+    <html lang="pt-BR" suppressHydrationWarning>
+      <body
+        className={`${inter.className} bg-background text-foreground transition-colors duration-300`}
+      >
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <BookProvider>
+            <Navbar />
+            <main>{children}</main>
+          </BookProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

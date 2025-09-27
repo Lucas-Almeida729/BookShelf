@@ -60,7 +60,7 @@ export default function BookForm({ initialData }: BookFormProps) {
       updateBook({ ...initialData, ...formData });
       setModalMessage("Livro atualizado com sucesso!"); // 3. Define a mensagem e abre o modal
     } else {
-      addBook(formData as Omit<Book, 'id'>);
+      addBook(formData);
       setModalMessage("Livro adicionado com sucesso!"); // 3. Define a mensagem e abre o modal
     }
     setShowSuccessModal(true); // 3. Abre o modal

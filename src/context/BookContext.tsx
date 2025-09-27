@@ -2,13 +2,13 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { Book, Genre, Status } from '@/types/book'; // Importe Genre e Status
+import { Book, Genre, Status } from '@/types/book';
 import { initialBooks } from '@/lib/mock-data';
 
-// Define o que o nosso contexto irá fornecer
+// Define a interface para o que o nosso contexto irá fornecer
 interface BookContextType {
   books: Book[];
-  addBook: (book: Partial<Book>) => void; // Corrigido para aceitar Partial<Book>
+  addBook: (book: Partial<Book>) => void; // Aceita um livro parcial do formulário
   updateBook: (updatedBook: Book) => void;
   deleteBook: (bookId: string) => void;
   getBookById: (bookId: string) => Book | undefined;
@@ -21,14 +21,13 @@ const BookContext = createContext<BookContextType | undefined>(undefined);
 export function BookProvider({ children }: { children: ReactNode }) {
   const [books, setBooks] = useState<Book[]>([]);
 
-  // Este useEffect roda apenas uma vez quando o app carrega
+  // Carrega os livros do localStorage na primeira vez
   useEffect(() => {
     try {
       const storedBooks = localStorage.getItem('bookshelf-data');
       if (storedBooks) {
         setBooks(JSON.parse(storedBooks));
       } else {
-        // Se não houver nada no localStorage, carrega os dados iniciais
         setBooks(initialBooks);
       }
     } catch (error) {
@@ -37,31 +36,31 @@ export function BookProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // Este useEffect salva os livros no localStorage sempre que a lista 'books' mudar
+  // Salva os livros no localStorage sempre que a lista 'books' mudar
   useEffect(() => {
-    // Apenas salva se a lista de livros já foi inicializada
     if (books.length > 0) {
         localStorage.setItem('bookshelf-data', JSON.stringify(books));
     }
   }, [books]);
 
-  // Função addBook corrigida para criar um objeto Book completo
+  // --- FUNÇÃO CORRIGIDA ---
   const addBook = (bookData: Partial<Book>) => {
     if (!bookData.title || !bookData.author) {
       console.error("Tentativa de adicionar um livro sem título ou autor.");
       return;
     }
 
+    // Cria um objeto Book completo e válido, com valores padrão para campos opcionais
     const newBook: Book = {
-      id: new Date().toISOString(),
+      id: new Date().toISOString(), // Gera um ID único e confiável
       title: bookData.title,
       author: bookData.author,
       year: bookData.year,
       pages: bookData.pages,
       cover: bookData.cover,
       genre: bookData.genre,
-      status: bookData.status || 'QUERO_LER',
-      rating: bookData.rating || 0,
+      status: bookData.status || 'QUERO_LER', // Valor padrão
+      rating: bookData.rating || 0,            // Valor padrão
       synopsis: bookData.synopsis,
       currentPage: bookData.currentPage,
       notes: bookData.notes,
