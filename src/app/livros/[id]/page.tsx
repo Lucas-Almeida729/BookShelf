@@ -1,7 +1,7 @@
 // src/app/livros/[id]/page.tsx
 "use client";
 
-import { use } from 'react'; // 1. Importe o 'use' do React
+import { use } from 'react';
 import { Badge } from "@/components/ui/badge";
 import StarRating from "@/components/StarRating";
 import Link from 'next/link';
@@ -9,18 +9,13 @@ import { Button } from "@/components/ui/button";
 import Image from 'next/image';
 import { useBooks } from "@/context/BookContext";
 
-// 2. Defina o tipo de props com 'params' como uma Promise
 type PageProps = {
   params: Promise<{ id: string }>;
 };
 
 export default function DetalhesLivroPage({ params }: PageProps) {
-  // 3. Use o hook para resolver a Promise
   const resolvedParams = use(params);
-
   const { getBookById } = useBooks();
-  
-  // 4. Use o valor resolvido
   const book = getBookById(resolvedParams.id);
 
   if (!book) {
@@ -33,7 +28,8 @@ export default function DetalhesLivroPage({ params }: PageProps) {
         <div className="md:col-span-1">
           <div className="relative w-full aspect-[2/3] shadow-lg bg-gray-100 dark:bg-gray-800 rounded-lg">
             <Image
-              src={book.cover || 'https://via.placeholder.com/300x400.png?text=Sem+Capa'}
+              // --- LINHA CORRIGIDA ---
+              src={book.cover ? book.cover : 'https://via.placeholder.com/300x400.png?text=Sem+Capa'}
               alt={`Capa do livro ${book.title}`}
               fill
               style={{ objectFit: 'contain' }}

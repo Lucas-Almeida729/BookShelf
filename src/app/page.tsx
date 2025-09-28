@@ -32,7 +32,7 @@ export default function HomePage() {
             title="Total de Livros"
             count={totalLivros}
             Icon={Library}
-            className="hover:border-blue-500 hover:bg-blue-50"
+            className="hover:border-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/20"
             animationDelay={0}
           />
         </Link>
@@ -43,7 +43,7 @@ export default function HomePage() {
             title="Lendo Atualmente"
             count={livrosLendo}
             Icon={PlayCircle}
-            className="hover:border-yellow-500 hover:bg-yellow-50"
+            className="hover:border-yellow-500 hover:bg-yellow-100 dark:hover:bg-yellow-900/20"
             animationDelay={100}
           />
         </Link>
@@ -54,7 +54,7 @@ export default function HomePage() {
             title="Livros Finalizados"
             count={livrosFinalizados}
             Icon={Book}
-            className="hover:border-green-500 hover:bg-green-50"
+            className="hover:border-green-500 hover:bg-green-100 dark:hover:bg-green-900/20"
             animationDelay={200}
           />
         </Link>
@@ -65,7 +65,7 @@ export default function HomePage() {
             title="Pausados"
             count={livrosPausados}
             Icon={PauseCircle}
-            className="hover:border-orange-500 hover:bg-orange-50"
+            className="hover:border-orange-500 hover:bg-orange-100 dark:hover:bg-orange-900/20"
             animationDelay={300}
           />
         </Link>
@@ -76,7 +76,7 @@ export default function HomePage() {
             title="Abandonados"
             count={livrosAbandonados}
             Icon={XCircle}
-            className="hover:border-red-500 hover:bg-red-50"
+            className="hover:border-red-500 hover:bg-red-100 dark:hover:bg-red-900/20"
             animationDelay={400}
           />
         </Link>
