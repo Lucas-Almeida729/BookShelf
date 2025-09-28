@@ -1,7 +1,7 @@
 // src/types/book.ts
 
 export const statuses = ["QUERO_LER", "LENDO", "LIDO", "PAUSADO", "ABANDONADO"] as const;
-export const genres = ["Literatura Brasileira", "Ficção Científica", "Realismo Mágico", "Fantasia", "Romance", "Biografia", "História", "Autoajuda", "Tecnologia", "Programação", "Negócios", "Psicologia", "Filosofia", "Poesia"] as const;
+export let genres = ["Literatura Brasileira", "Ficção Científica", "Realismo Mágico", "Fantasia", "Romance", "Biografia", "História", "Autoajuda", "Tecnologia", "Programação", "Negócios", "Psicologia", "Filosofia", "Poesia"] as const;
 
 export type Status = typeof statuses[number];
 export type Genre = typeof genres[number];

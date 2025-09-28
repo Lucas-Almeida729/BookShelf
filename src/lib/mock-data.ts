@@ -1,7 +1,7 @@
 // src/lib/mock-data.ts
 import { Book } from "@/types/book";
 
-export const initialBooks: Book[] = [
+export let initialBooks: Book[] = [
   {
     id: "1",
     title: "Dom Casmurro",
