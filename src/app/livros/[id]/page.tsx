@@ -1,22 +1,17 @@
 // src/app/livros/[id]/page.tsx
-"use client";
-
-import { use } from 'react';
 import { Badge } from "@/components/ui/badge";
 import StarRating from "@/components/StarRating";
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import Image from 'next/image';
-import { useBooks } from "@/context/BookContext";
+import { fetchBookById } from "@/lib/data";
 
 type PageProps = {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 };
 
-export default function DetalhesLivroPage({ params }: PageProps) {
-  const resolvedParams = use(params);
-  const { getBookById } = useBooks();
-  const book = getBookById(resolvedParams.id);
+export default async function DetalhesLivroPage({ params }: PageProps) {
+  const book = await fetchBookById(params.id);
 
   if (!book) {
     return <div className="text-center mt-10">Livro não encontrado!</div>;
@@ -28,7 +23,6 @@ export default function DetalhesLivroPage({ params }: PageProps) {
         <div className="md:col-span-1">
           <div className="relative w-full aspect-[2/3] shadow-lg bg-gray-100 dark:bg-gray-800 rounded-lg">
             <Image
-              // --- LINHA CORRIGIDA ---
               src={book.cover ? book.cover : 'https://via.placeholder.com/300x400.png?text=Sem+Capa'}
               alt={`Capa do livro ${book.title}`}
               fill

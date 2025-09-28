@@ -2,11 +2,9 @@
 import Link from 'next/link';
 import DashboardCard from "@/components/DashboardCard";
 import { Book, Library, PauseCircle, PlayCircle, XCircle } from "lucide-react";
-import { fetchBooks } from '@/lib/data'; // Importamos a função de data fetching
+import { fetchBooks } from '@/lib/data';
 
-// A página agora é uma função 'async'
 export default async function HomePage() {
-  // Os dados são buscados diretamente no servidor antes da página ser renderizada
   const books = await fetchBooks();
 
   const totalLivros = books.length;
@@ -44,6 +42,8 @@ export default async function HomePage() {
             className="hover:border-green-500 hover:bg-green-500"
           />
         </Link>
+        
+        {/* --- LINHA CORRIGIDA --- */}
         <Link href="/biblioteca?status=PAUSADO" className="group">
           <DashboardCard 
             title="Pausados"
@@ -52,6 +52,7 @@ export default async function HomePage() {
             className="hover:border-orange-500 hover:bg-orange-500"
           />
         </Link>
+
         <Link href="/biblioteca?status=ABANDONADO" className="group">
           <DashboardCard 
             title="Abandonados"

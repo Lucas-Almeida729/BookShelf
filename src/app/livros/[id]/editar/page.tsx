@@ -1,23 +1,9 @@
 // src/app/livros/[id]/editar/page.tsx
-"use client";
-
-import { use } from 'react'; // 1. Importe o 'use' do React
 import BookForm from "@/components/BookForm";
-import { useBooks } from "@/context/BookContext";
+import { fetchBookById } from "@/lib/data";
 
-// 2. A propriedade 'params' agora é tipada como uma Promise
-type PageProps = {
-  params: Promise<{ id: string }>;
-};
-
-export default function EditarLivroPage({ params }: PageProps) {
-  // 3. Use o hook React.use() para extrair o valor da Promise
-  const resolvedParams = use(params);
-  
-  const { getBookById } = useBooks();
-  
-  // 4. Use o valor resolvido para buscar o livro
-  const book = getBookById(resolvedParams.id);
+export default async function EditarLivroPage({ params }: { params: { id: string } }) {
+  const book = await fetchBookById(params.id);
 
   if (!book) {
     return <div className="text-center mt-10">Livro não encontrado!</div>;
