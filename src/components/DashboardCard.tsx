@@ -19,7 +19,7 @@ export default function DashboardCard({
 }: DashboardCardProps) {
   return (
     <Card
-      className={`transition-all duration-300 hover:shadow-xl hover:-translate-y-1 animate-in fade-in-0 slide-in-from-bottom-4 ${className}`}
+      className={`flex flex-col justify-between min-h-[150px] transition-all duration-300 hover:shadow-xl hover:-translate-y-1 animate-in fade-in-0 slide-in-from-bottom-4 ${className}`}
       style={{
         animationDelay: `${animationDelay}ms`,
       }}

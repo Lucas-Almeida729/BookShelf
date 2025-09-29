@@ -1,7 +1,7 @@
 // src/app/api/books/route.ts
-import { NextResponse } from 'next/server';
-import { initialBooks } from '@/lib/mock-data';
-import { Book } from '@/types/book';
+import { NextResponse } from "next/server";
+import { initialBooks } from "@/lib/mock-data";
+import { Book } from "@/types/book";
 
 // GET /api/books - Listar todos os livros
 export async function GET() {
@@ -17,7 +17,10 @@ export async function POST(request: Request) {
 
     // Validação simples dos dados recebidos
     if (!body.title || !body.author) {
-      return NextResponse.json({ message: 'Título e autor são obrigatórios.' }, { status: 400 });
+      return NextResponse.json(
+        { message: "Título e autor são obrigatórios." },
+        { status: 400 }
+      );
     }
 
     const newBook: Book = {
@@ -28,7 +31,7 @@ export async function POST(request: Request) {
       pages: body.pages,
       cover: body.cover,
       genre: body.genre,
-      status: body.status || 'QUERO_LER',
+      status: body.status || "QUERO LER",
       rating: body.rating || 0,
       synopsis: body.synopsis,
     };
@@ -37,8 +40,10 @@ export async function POST(request: Request) {
     initialBooks.push(newBook);
 
     return NextResponse.json(newBook, { status: 201 }); // 201 Created
-
   } catch (error) {
-    return NextResponse.json({ message: 'Erro ao criar o livro.', error }, { status: 500 });
+    return NextResponse.json(
+      { message: "Erro ao criar o livro.", error },
+      { status: 500 }
+    );
   }
 }
