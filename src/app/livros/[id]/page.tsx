@@ -51,7 +51,7 @@ export default async function DetalhesLivroPage({ params }: PageProps) {
             <p><strong>Status:</strong> {book.status || 'Não informado'}</p>
           </div>
           <h3 className="text-2xl font-semibold border-b pb-2 mb-4">Sinopse</h3>
-          <p className="text-base text-gray-700 leading-relaxed">
+          <p className="text-base text-gray-500 leading-relaxed">
             {book.synopsis || 'Nenhuma sinopse disponível.'}
           </p>
         </div>
