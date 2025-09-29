@@ -1,9 +1,15 @@
 // src/components/BookFilters.tsx
 "use client";
 
-import { useSearchParams, usePathname, useRouter } from 'next/navigation';
+import { useSearchParams, usePathname, useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { genres, statuses } from "@/types/book";
 
 export default function BookFilters() {
@@ -14,7 +20,7 @@ export default function BookFilters() {
   // Função para atualizar os parâmetros da URL quando um filtro muda
   const handleFilterChange = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams);
-    if (value && value !== 'ALL') {
+    if (value && value !== "ALL") {
       params.set(key, value);
     } else {
       params.delete(key);
@@ -32,24 +38,26 @@ export default function BookFilters() {
           type="text"
           placeholder="Buscar por título ou autor..."
           className="w-full"
-          defaultValue={searchParams.get('query')?.toString()}
-          onChange={(e) => handleFilterChange('query', e.target.value)}
+          defaultValue={searchParams.get("query")?.toString()}
+          onChange={(e) => handleFilterChange("query", e.target.value)}
         />
       </div>
 
       {/* Filtro por Gênero */}
       <div>
-        <Select 
-          onValueChange={(value) => handleFilterChange('genre', value)} 
-          defaultValue={searchParams.get('genre')?.toString() || 'ALL'}
+        <Select
+          onValueChange={(value) => handleFilterChange("genre", value)}
+          defaultValue={searchParams.get("genre")?.toString() || "ALL"}
         >
           <SelectTrigger id="genre-filter">
             <SelectValue placeholder="Filtrar por gênero" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="ALL">Todos os Gêneros</SelectItem>
-            {genres.map(g => (
-              <SelectItem key={g} value={g}>{g}</SelectItem>
+            {genres.map((g) => (
+              <SelectItem key={g} value={g}>
+                {g}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -57,17 +65,19 @@ export default function BookFilters() {
 
       {/* Filtro por Status */}
       <div>
-        <Select 
-          onValueChange={(value) => handleFilterChange('status', value)} 
-          defaultValue={searchParams.get('status')?.toString() || 'ALL'}
+        <Select
+          onValueChange={(value) => handleFilterChange("status", value)}
+          defaultValue={searchParams.get("status")?.toString() || "ALL"}
         >
           <SelectTrigger id="status-filter">
             <SelectValue placeholder="Filtrar por status" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="ALL">Todos os Status</SelectItem>
-            {statuses.map(s => (
-              <SelectItem key={s} value={s}>{s}</SelectItem>
+            {statuses.map((s) => (
+              <SelectItem key={s} value={s}>
+                {s}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
