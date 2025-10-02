@@ -1,11 +1,24 @@
 // src/components/BookActions.tsx
 "use client";
 
-import { deleteBook } from "@/lib/actions"; // Importa a Server Action
+import { deleteBook } from "@/lib/actions";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import Link from 'next/link';
 import { useState } from "react";
+import { useFormStatus } from "react-dom";
+import { Loader2 } from "lucide-react";
+
+// Componente interno para o botão de exclusão com estado de carregamento
+function DeleteButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button variant="destructive" type="submit" disabled={pending}>
+      {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+      {pending ? "Excluindo..." : "Sim, excluir livro"}
+    </Button>
+  );
+}
 
 interface BookActionsProps {
   bookId: string;
@@ -13,8 +26,12 @@ interface BookActionsProps {
 
 export default function BookActions({ bookId }: BookActionsProps) {
   const [isConfirmOpen, setConfirmOpen] = useState(false);
-  // A ação de deletar agora está vinculada ao ID do livro
-  const deleteBookWithId = deleteBook.bind(null, bookId);
+  
+  // Usamos 'action' para passar a Server Action para o formulário
+  const deleteAction = async () => {
+    await deleteBook(bookId);
+    setConfirmOpen(false); // Fecha o modal após a ação
+  };
 
   return (
     <div className="flex items-center gap-2 mt-4">
@@ -34,9 +51,8 @@ export default function BookActions({ bookId }: BookActionsProps) {
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmOpen(false)}>Cancelar</Button>
-            {/* O botão de exclusão agora está dentro de um formulário que chama a Server Action */}
-            <form action={deleteBookWithId}>
-              <Button variant="destructive" type="submit">Sim, excluir livro</Button>
+            <form action={deleteAction}>
+              <DeleteButton />
             </form>
           </DialogFooter>
         </DialogContent>

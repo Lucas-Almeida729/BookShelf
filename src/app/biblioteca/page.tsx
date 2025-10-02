@@ -1,58 +1,39 @@
 // src/app/biblioteca/page.tsx
-import { fetchBooks } from "@/lib/data";
-import BookCard from "@/components/BookCard";
-import BookFilters from "@/components/BookFilters"; // Nosso novo componente de cliente
-import { Status, Genre } from "@/types/book";
 
-// A página da biblioteca agora recebe 'searchParams' como prop
-type PageProps = {
-  searchParams?: {
-    query?: string;
-    genre?: Genre;
-    status?: Status;
-  };
-};
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { BookCard } from '@/components/BookCard'; // Vamos garantir que esse componente esteja atualizado
+import { getBooks } from '@/lib/database'; // Importando nossa função do banco de dados!
 
-export default async function BibliotecaPage({ searchParams }: PageProps) {
-  // 1. Busca todos os livros no servidor
-  const allBooks = await fetchBooks();
-
-  // 2. Pega os valores dos filtros da URL (ou usa valores padrão)
-  const query = searchParams?.query || '';
-  const selectedGenre = searchParams?.genre;
-  const selectedStatus = searchParams?.status;
-
-  // 3. Aplica a lógica de filtro no servidor
-  const filteredBooks = allBooks.filter(book => {
-    const matchesSearchTerm = 
-      book.title.toLowerCase().includes(query.toLowerCase()) ||
-      book.author.toLowerCase().includes(query.toLowerCase());
-    
-    const matchesGenre = selectedGenre ? book.genre === selectedGenre : true;
-    const matchesStatus = selectedStatus ? book.status === selectedStatus : true;
-
-    return matchesSearchTerm && matchesGenre && matchesStatus;
-  });
+// Note a palavra "async" aqui. Isso transforma a página em um Componente de Servidor
+// que pode esperar (await) a busca de dados terminar.
+export default async function BibliotecaPage() {
+  // A mágica acontece aqui! Chamamos a função que busca os livros no banco de dados.
+  // A página só vai ser construída depois que a variável "books" tiver os dados.
+  const books = await getBooks();
 
   return (
-    <main className="container mx-auto p-4 md:p-8">
-      <h1 className="text-3xl font-bold mb-8 text-center">Minha Biblioteca</h1>
-      
-      {/* Renderiza o componente de cliente para os filtros interativos */}
-      <BookFilters />
-      
-      {filteredBooks.length === 0 ? (
-        <p className="text-center text-gray-500 mt-12">Nenhum livro encontrado com os filtros atuais.</p>
+    <div className="container mx-auto p-4">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Minha Biblioteca</h1>
+        <Button asChild>
+          <Link href="/livros/novo">Adicionar Livro</Link>
+        </Button>
+      </div>
+
+      {/* Se não houver livros, mostramos uma mensagem amigável */}
+      {books.length === 0 ? (
+        <p className="text-center text-gray-500">
+          Sua biblioteca está vazia. Adicione seu primeiro livro!
+        </p>
       ) : (
+        // Se houver livros, nós os exibimos em um grid
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredBooks.map(book => (
-            <BookCard 
-              key={book.id} 
-              book={book} 
-            />
+          {books.map((book) => (
+            <BookCard key={book.id} book={book} />
           ))}
         </div>
       )}
-    </main>
+    </div>
   );
 }
