@@ -75,11 +75,21 @@ export async function getBookStats() {
     where: { status: 'LIDO' },
   });
 
+  // Novas queries para os novos cards
+  const booksToRead = await prisma.book.count({ where: { status: 'QUERO_LER' } });
+  const booksPaused = await prisma.book.count({ where: { status: 'PAUSADO' } });
+  const booksAbandoned = await prisma.book.count({ where: { status: 'ABANDONADO' } });
+
+
   return {
     totalBooks,
     booksRead,
     booksReading,
     pagesRead: pagesRead._sum.pages ?? 0,
+    // Adicione os novos resultados ao objeto de retorno
+    booksToRead,
+    booksPaused,
+    booksAbandoned,
   };
 }
 

@@ -50,6 +50,7 @@ export default async function BookDetailsPage({ params }: { params: { id: string
           <div className="space-y-2 mb-4">
             <p><strong>Gênero:</strong> {book.genre || 'Não especificado'}</p>
             <p><strong>Ano:</strong> {book.year || 'Não especificado'}</p>
+            <p><strong>Páginas:</strong> {book.pages || 'Não especificado'}</p>
             <p><strong>Status:</strong> {book.status.replace('_', ' ')}</p>
           </div>
 

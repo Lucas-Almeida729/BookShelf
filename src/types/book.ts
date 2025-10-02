@@ -1,7 +1,7 @@
 // src/types/book.ts
 
 export const statuses = [
-  "QUERO LER",
+  "QUERO_LER",
   "LENDO",
   "LIDO",
   "PAUSADO",
