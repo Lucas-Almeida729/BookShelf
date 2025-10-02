@@ -1,5 +1,6 @@
 // src/components/BookForm.tsx
 "use client";
+"use client";
 
 import { useState } from "react";
 import { Book } from "@prisma/client";
@@ -7,6 +8,7 @@ import { statuses, genres } from "@/types/book";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Star } from "lucide-react";
 import { createBookAction, updateBookAction } from "@/lib/actions";
@@ -28,9 +30,11 @@ export default function BookForm({ book: initialData }: BookFormProps) {
         <div className="space-y-2">
           <Label htmlFor="title">Título *</Label>
           <Input id="title" name="title" defaultValue={initialData?.title} required />
+          <Input id="title" name="title" defaultValue={initialData?.title} required />
         </div>
         <div className="space-y-2">
           <Label htmlFor="author">Autor *</Label>
+          <Input id="author" name="author" defaultValue={initialData?.author} required />
           <Input id="author" name="author" defaultValue={initialData?.author} required />
         </div>
       </div>
@@ -73,7 +77,9 @@ export default function BookForm({ book: initialData }: BookFormProps) {
         <Textarea id="synopsis" name="synopsis" defaultValue={initialData?.synopsis || ''} rows={5} />
       </div>
       
+      
       <input type="hidden" name="rating" value={rating} />
+      
       
       <div className="space-y-2">
         <Label>Avaliação</Label>
@@ -81,9 +87,12 @@ export default function BookForm({ book: initialData }: BookFormProps) {
           {[1, 2, 3, 4, 5].map((starValue) => (
             <button type="button" key={starValue} onClick={() => setRating(starValue)}>
               <Star size={24} className={starValue <= rating ? "text-yellow-500 fill-current" : "text-gray-300"} />
+            <button type="button" key={starValue} onClick={() => setRating(starValue)}>
+              <Star size={24} className={starValue <= rating ? "text-yellow-500 fill-current" : "text-gray-300"} />
             </button>
           ))}
           {rating > 0 && (
+            <button type="button" onClick={() => setRating(0)} className="ml-2 text-sm text-muted-foreground hover:text-foreground">Limpar</button>
             <button type="button" onClick={() => setRating(0)} className="ml-2 text-sm text-muted-foreground hover:text-foreground">Limpar</button>
           )}
         </div>
