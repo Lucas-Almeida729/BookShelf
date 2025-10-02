@@ -2,7 +2,7 @@
 import { prisma } from './prisma'
 import { Book, Genre } from '@prisma/client'
 
-// Tipos para os dados, que podem ser movidos para src/types/index.ts
+// Tipos...
 export type ReadingStatus = 'QUERO_LER' | 'LENDO' | 'LIDO' | 'PAUSADO' | 'ABANDONADO'
 
 export interface BookWithGenre extends Book {
@@ -29,13 +29,43 @@ export interface UpdateBookData extends Partial<CreateBookData> {
   id: string
 }
 
-// ... (outros tipos como BookStats e BookFilters)
-
-// Funções de CRUD para Livros
-export async function getBooks(filters?: any) {
-  // ... (implementar lógica de filtro como em BookShelf_teste/src/lib/database.ts)
-  return await prisma.book.findMany({ orderBy: { createdAt: 'desc' } })
+// Interface para os filtros
+export interface BookFilters {
+  query?: string;
+  genre?: string;
+  status?: string;
 }
+
+
+// --- Funções de CRUD para Livros ---
+
+// VERSÃO ATUALIZADA DA FUNÇÃO getBooks
+export async function getBooks(filters: BookFilters = {}) {
+  const { query, genre, status } = filters;
+
+  const where: any = {};
+
+  if (query) {
+    where.OR = [
+      { title: { contains: query, mode: 'insensitive' } },
+      { author: { contains: query, mode: 'insensitive' } },
+    ];
+  }
+
+  if (genre && genre !== 'ALL') {
+    where.genre = genre;
+  }
+
+  if (status && status !== 'ALL') {
+    where.status = status;
+  }
+
+  return await prisma.book.findMany({
+    where,
+    orderBy: { createdAt: 'desc' },
+  });
+}
+
 
 export async function getBook(id: string) {
   return await prisma.book.findUnique({ where: { id } })
@@ -54,16 +84,30 @@ export async function deleteBook(id: string) {
   return await prisma.book.delete({ where: { id } })
 }
 
-// Funções para Gêneros
+// --- Funções de Gêneros ---
 export async function getGenres() {
-  return await prisma.genre.findMany({ orderBy: { name: 'asc' } })
+  // Vamos buscar os gêneros a partir dos livros existentes para garantir que a lista esteja sempre atualizada
+  const distinctGenres = await prisma.book.findMany({
+    where: {
+      genre: {
+        not: null,
+      },
+    },
+    select: {
+      genre: true,
+    },
+    distinct: ['genre'],
+  });
+
+  // Extrai apenas os nomes dos gêneros e ordena
+  return distinctGenres
+    .map((b) => b.genre!)
+    .sort();
 }
 
-// ... (outras funções como getBookStats, etc.)
 
 // --- Funções para o Dashboard ---
 
-// Retorna as estatísticas gerais da biblioteca
 export async function getBookStats() {
   const totalBooks = await prisma.book.count();
   const booksRead = await prisma.book.count({ where: { status: 'LIDO' } });
@@ -74,8 +118,6 @@ export async function getBookStats() {
     },
     where: { status: 'LIDO' },
   });
-
-  // Novas queries para os novos cards
   const booksToRead = await prisma.book.count({ where: { status: 'QUERO_LER' } });
   const booksPaused = await prisma.book.count({ where: { status: 'PAUSADO' } });
   const booksAbandoned = await prisma.book.count({ where: { status: 'ABANDONADO' } });
@@ -86,26 +128,23 @@ export async function getBookStats() {
     booksRead,
     booksReading,
     pagesRead: pagesRead._sum.pages ?? 0,
-    // Adicione os novos resultados ao objeto de retorno
     booksToRead,
     booksPaused,
     booksAbandoned,
   };
 }
 
-// Retorna os livros que estão atualmente sendo lidos
 export async function getReadingNow() {
   return await prisma.book.findMany({
     where: { status: 'LENDO' },
     orderBy: { updatedAt: 'desc' },
-    take: 5, // Pega no máximo 5 para não poluir a tela
+    take: 5,
   });
 }
 
-// Retorna os últimos livros adicionados à estante
 export async function getRecentBooks() {
   return await prisma.book.findMany({
     orderBy: { createdAt: 'desc' },
-    take: 4, // Pega os 4 mais recentes
+    take: 4,
   });
 }

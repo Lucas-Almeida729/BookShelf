@@ -7,6 +7,7 @@ export const statuses = [
   "PAUSADO",
   "ABANDONADO",
 ] as const;
+
 export let genres = [
   "Literatura Brasileira",
   "Ficção Científica",
@@ -28,16 +29,16 @@ export type Status = (typeof statuses)[number];
 export type Genre = (typeof genres)[number];
 
 export interface Book {
-  id: string; // [cite: 57]
-  title: string; // [cite: 58]
-  author: string; // [cite: 58]
-  year?: number; // [cite: 58]
-  pages?: number; // [cite: 58]
-  cover?: string; // [cite: 61]
-  genre?: Genre; // [cite: 58]
+  id: string;
+  title: string;
+  author: string;
+  year?: number;
+  pages?: number;
+  cover?: string;
+  genre?: Genre;
   status?: Status;
-  rating?: number; // [cite: 59]
-  synopsis?: string; // [cite: 60]
+  rating?: number;
+  synopsis?: string;
   currentPage?: number;
   notes?: string;
 }

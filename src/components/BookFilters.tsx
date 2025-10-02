@@ -2,6 +2,7 @@
 "use client";
 
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
+import { useDebouncedCallback } from 'use-debounce';
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -10,14 +11,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { genres, statuses } from "@/types/book";
+import { statuses } from "@/types/book";
 
-export default function BookFilters() {
+interface BookFiltersProps {
+  genres: string[];
+}
+
+export default function BookFilters({ genres }: BookFiltersProps) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
 
-  // Função para atualizar os parâmetros da URL quando um filtro muda
   const handleFilterChange = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams);
     if (value && value !== "ALL") {
@@ -25,12 +29,24 @@ export default function BookFilters() {
     } else {
       params.delete(key);
     }
-    // Navega para a mesma página com os novos parâmetros de busca
     replace(`${pathname}?${params.toString()}`);
   };
 
+  const handleSearch = useDebouncedCallback((term: string) => {
+    handleFilterChange('query', term);
+  }, 300);
+
+  // Esta função ajuda a exibir o valor correto no placeholder do Select
+  const getDisplayStatus = () => {
+    const status = searchParams.get("status");
+    if (!status || status === "ALL") {
+      return "Filtrar por status";
+    }
+    return status.replace(/_/g, " ");
+  };
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 max-w-4xl mx-auto">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
       {/* Campo de Busca */}
       <div className="md:col-span-1">
         <Input
@@ -38,8 +54,8 @@ export default function BookFilters() {
           type="text"
           placeholder="Buscar por título ou autor..."
           className="w-full"
-          defaultValue={searchParams.get("query")?.toString()}
-          onChange={(e) => handleFilterChange("query", e.target.value)}
+          defaultValue={searchParams.get("query")?.toString() || ""}
+          onChange={(e) => handleSearch(e.target.value)}
         />
       </div>
 
@@ -63,20 +79,20 @@ export default function BookFilters() {
         </Select>
       </div>
 
-      {/* Filtro por Status */}
+      {/* Filtro por Status - CORRIGIDO */}
       <div>
         <Select
           onValueChange={(value) => handleFilterChange("status", value)}
           defaultValue={searchParams.get("status")?.toString() || "ALL"}
         >
           <SelectTrigger id="status-filter">
-            <SelectValue placeholder="Filtrar por status" />
+            <SelectValue placeholder="Filtrar por status">{getDisplayStatus()}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="ALL">Todos os Status</SelectItem>
             {statuses.map((s) => (
               <SelectItem key={s} value={s}>
-                {s}
+                {s.replace(/_/g, " ")}
               </SelectItem>
             ))}
           </SelectContent>
