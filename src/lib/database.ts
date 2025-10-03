@@ -39,16 +39,16 @@ export interface BookFilters {
 
 // --- Funções de CRUD para Livros ---
 
-// VERSÃO ATUALIZADA DA FUNÇÃO getBooks
 export async function getBooks(filters: BookFilters = {}) {
   const { query, genre, status } = filters;
 
   const where: any = {};
 
   if (query) {
+    // AQUI ESTÁ A CORREÇÃO: O 'mode: "insensitive"' foi removido
     where.OR = [
-      { title: { contains: query, mode: 'insensitive' } },
-      { author: { contains: query, mode: 'insensitive' } },
+      { title: { contains: query } },
+      { author: { contains: query } },
     ];
   }
 
@@ -86,7 +86,6 @@ export async function deleteBook(id: string) {
 
 // --- Funções de Gêneros ---
 export async function getGenres() {
-  // Vamos buscar os gêneros a partir dos livros existentes para garantir que a lista esteja sempre atualizada
   const distinctGenres = await prisma.book.findMany({
     where: {
       genre: {
@@ -99,7 +98,6 @@ export async function getGenres() {
     distinct: ['genre'],
   });
 
-  // Extrai apenas os nomes dos gêneros e ordena
   return distinctGenres
     .map((b) => b.genre!)
     .sort();

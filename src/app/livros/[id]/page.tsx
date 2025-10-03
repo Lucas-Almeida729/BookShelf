@@ -5,7 +5,9 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import DeleteBookButton from '@/components/DeleteBookButton'; // Importe o botão de deletar
+import DeleteBookButton from '@/components/DeleteBookButton';
+import { Progress } from '@/components/ui/progress'; // 1. Importar o componente de progresso
+import UpdateProgressForm from '@/components/UpdateProgressForm'; // 2. Importar o novo formulário
 
 export default async function BookDetailsPage({ params }: { params: { id: string } }) {
   const book = await getBook(params.id);
@@ -13,6 +15,11 @@ export default async function BookDetailsPage({ params }: { params: { id: string
   if (!book) {
     notFound();
   }
+  
+  // Calcula o progresso
+  const progressPercentage = (book.pages && book.currentPage)
+    ? Math.round((book.currentPage / book.pages) * 100)
+    : 0;
 
   return (
     <div className="container mx-auto p-4">
@@ -50,9 +57,30 @@ export default async function BookDetailsPage({ params }: { params: { id: string
           <div className="space-y-2 mb-4">
             <p><strong>Gênero:</strong> {book.genre || 'Não especificado'}</p>
             <p><strong>Ano:</strong> {book.year || 'Não especificado'}</p>
-            <p><strong>Páginas:</strong> {book.pages || 'Não especificado'}</p>
-            <p><strong>Status:</strong> {book.status.replace('_', ' ')}</p>
+            {book.pages && <p><strong>Páginas:</strong> {book.pages}</p>}
+            <p><strong>Status:</strong> {book.status.replace(/_/g, ' ')}</p>
           </div>
+
+          {/* 3. Seção de Progresso (aparece apenas se o status for "LENDO") */}
+          {book.status === 'LENDO' && book.pages && book.pages > 0 && (
+            <div className="my-6 p-4 border rounded-lg">
+              <h3 className="text-lg font-semibold mb-2">Progresso da Leitura</h3>
+              <div className="flex items-center gap-4 mb-2">
+                <Progress value={progressPercentage} className="w-full" />
+                <span className="text-sm font-medium text-muted-foreground">{progressPercentage}%</span>
+              </div>
+              <div className="flex items-center justify-between">
+                 <p className="text-sm text-muted-foreground">
+                  Página {book.currentPage || 0} de {book.pages}
+                </p>
+                <UpdateProgressForm 
+                  bookId={book.id} 
+                  currentPage={book.currentPage}
+                  totalPages={book.pages}
+                />
+              </div>
+            </div>
+          )}
 
           <div className="prose max-w-none dark:prose-invert">
             <h3 className="font-bold">Sinopse</h3>

@@ -2,7 +2,7 @@
 "use client";
 
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
-import { useDebouncedCallback } from 'use-debounce';
+import { useDebouncedCallback } from "use-debounce";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -33,17 +33,8 @@ export default function BookFilters({ genres }: BookFiltersProps) {
   };
 
   const handleSearch = useDebouncedCallback((term: string) => {
-    handleFilterChange('query', term);
+    handleFilterChange("query", term);
   }, 300);
-
-  // Esta função ajuda a exibir o valor correto no placeholder do Select
-  const getDisplayStatus = () => {
-    const status = searchParams.get("status");
-    if (!status || status === "ALL") {
-      return "Filtrar por status";
-    }
-    return status.replace(/_/g, " ");
-  };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
@@ -86,13 +77,14 @@ export default function BookFilters({ genres }: BookFiltersProps) {
           defaultValue={searchParams.get("status")?.toString() || "ALL"}
         >
           <SelectTrigger id="status-filter">
-            <SelectValue placeholder="Filtrar por status">{getDisplayStatus()}</SelectValue>
+            <SelectValue placeholder="Filtrar por status" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="ALL">Todos os Status</SelectItem>
             {statuses.map((s) => (
               <SelectItem key={s} value={s}>
                 {s.replace(/_/g, " ")}
+                {s}
               </SelectItem>
             ))}
           </SelectContent>

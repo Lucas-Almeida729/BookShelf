@@ -1,15 +1,15 @@
 // src/lib/actions.ts
 
-"use server"; // Marcador MÁGICO! Transforma todas as funções deste arquivo em Server Actions.
+"use server";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { z } from "zod"; // Biblioteca para validar dados
-import { createBook, updateBook, deleteBook } from "./database"; // Nossas funções do banco
+import { z } from "zod";
+import { createBook, updateBook, deleteBook } from "./database";
 
 // Define um "esquema" ou "molde" para validar os dados do formulário
 const BookSchema = z.object({
-  id: z.string().optional(), // ID é opcional, pois não existe ao criar um livro novo
+  id: z.string().optional(),
   title: z.string().min(1, "Título é obrigatório"),
   author: z.string().min(1, "Autor é obrigatório"),
   cover: z.string().url("Deve ser uma URL válida").optional().or(z.literal('')),
@@ -22,19 +22,23 @@ const BookSchema = z.object({
   rating: z.coerce.number().optional(),
 });
 
-// Ação para CRIAR um livro
+// --- NOVA VALIDAÇÃO PARA O PROGRESSO ---
+const ProgressSchema = z.object({
+  bookId: z.string(),
+  currentPage: z.coerce.number().min(0, "A página não pode ser negativa."),
+});
+
+// --- AÇÕES DE LIVRO (CRUD) ---
+
 export async function createBookAction(formData: FormData) {
-  // Converte os dados do formulário (FormData) para um objeto simples
   const rawData = Object.fromEntries(formData.entries());
   
-  // Valida os dados usando o schema do Zod
   const validatedFields = BookSchema.safeParse(rawData);
   if (!validatedFields.success) {
     console.error(validatedFields.error);
     throw new Error("Falha na validação dos dados.");
   }
 
-  // Se a validação passou, chama a função do banco de dados para criar o livro
   try {
     await createBook(validatedFields.data);
   } catch (error) {
@@ -42,13 +46,10 @@ export async function createBookAction(formData: FormData) {
     throw new Error("Falha ao criar o livro no banco de dados.");
   }
 
-  // Limpa o cache da página da biblioteca para que a lista de livros seja atualizada
   revalidatePath("/biblioteca");
-  // Redireciona o usuário de volta para a página da biblioteca
   redirect("/biblioteca");
 }
 
-// Ação para ATUALIZAR um livro
 export async function updateBookAction(formData: FormData) {
   const rawData = Object.fromEntries(formData.entries());
 
@@ -71,14 +72,11 @@ export async function updateBookAction(formData: FormData) {
     throw new Error("Falha ao atualizar o livro no banco de dados.");
   }
 
-  // Limpa o cache das páginas afetadas para mostrar os dados novos
   revalidatePath("/biblioteca");
   revalidatePath(`/livros/${id}`);
-  // Redireciona o usuário para a página de detalhes do livro que ele acabou de editar
   redirect(`/livros/${id}`);
 }
 
-// Ação para DELETAR um livro
 export async function deleteBookAction(id: string) {
     if (!id) {
         throw new Error("ID do livro não fornecido para exclusão.");
@@ -93,4 +91,31 @@ export async function deleteBookAction(id: string) {
 
     revalidatePath("/biblioteca");
     redirect("/biblioteca");
+}
+
+
+// --- NOVA SERVER ACTION PARA ATUALIZAR O PROGRESSO ---
+
+export async function updateBookProgressAction(formData: FormData) {
+  const rawData = Object.fromEntries(formData.entries());
+  const validatedFields = ProgressSchema.safeParse(rawData);
+
+  if (!validatedFields.success) {
+    console.error(validatedFields.error);
+    // Em uma aplicação real, você poderia retornar uma mensagem de erro para o usuário
+    throw new Error("Dados de progresso inválidos.");
+  }
+  
+  const { bookId, currentPage } = validatedFields.data;
+
+  try {
+    await updateBook(bookId, { currentPage });
+  } catch (error) {
+    console.error(error);
+    throw new Error("Falha ao atualizar o progresso no banco de dados.");
+  }
+
+  // Revalida o cache para que a página do livro e o dashboard mostrem o novo progresso
+  revalidatePath(`/livros/${bookId}`);
+  revalidatePath('/');
 }

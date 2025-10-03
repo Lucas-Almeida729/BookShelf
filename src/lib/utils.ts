@@ -12,7 +12,7 @@ export function cn(...inputs: ClassValue[]) {
 export const getStatusLabel = (status: ReadingStatus | string): string => {
   switch (status) {
     case 'QUERO_LER':
-      return 'Quero Ler';
+      return 'Quero_Ler';
     case 'LENDO':
       return 'Lendo';
     case 'LIDO':
