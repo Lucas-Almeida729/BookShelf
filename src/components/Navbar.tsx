@@ -4,13 +4,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/ThemeToggle"; // 1. Importe o ThemeToggle
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function Navbar() {
   const pathname = usePathname();
 
   return (
-    <nav className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-4 shadow-md border-b">
+    // AQUI ESTÁ A ALTERAÇÃO: Adicionamos as classes para fixar a barra
+    <nav className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-4 shadow-md border-b z-50">
       <div className="container mx-auto flex justify-between items-center">
         <Link
           href="/"
@@ -43,7 +44,6 @@ export default function Navbar() {
             <Link href="/livros/novo">Adicionar Livro</Link>
           </Button>
 
-          {/* 2. Adicione o componente aqui */}
           <ThemeToggle />
         </div>
       </div>

@@ -22,7 +22,10 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider>
           <Navbar />
-          {children}
+          {/* AQUI ESTÁ A ALTERAÇÃO: Adicionamos um <main> com padding-top */}
+          <main className="pt-20">
+            {children}
+          </main>
         </ThemeProvider>
       </body>
     </html>
