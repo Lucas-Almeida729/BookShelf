@@ -4,11 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Book } from "@prisma/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress"; // **Atenção aqui!**
-
-// **Atenção:** Pode ser que você não tenha o componente Progress.
-// Se o VS Code mostrar erro, pegue o código dele no projeto de referência:
-// BookShelf_teste/src/components/ui/progress.tsx
+import { Progress } from "@/components/ui/progress";
 
 interface ReadingProgressProps {
   readingNow: Book[];
@@ -37,9 +33,11 @@ export default function ReadingProgress({ readingNow }: ReadingProgressProps) {
                            <div className="w-full h-full bg-gray-200 rounded-sm" />
                        )}
                     </div>
-                    <div className="w-full">
-                      <p className="font-semibold truncate group-hover:underline">{book.title}</p>
-                      <p className="text-sm text-muted-foreground">{book.author}</p>
+                    {/* AQUI ESTÁ A MUDANÇA */}
+                    <div className="flex-1 min-w-0">
+                      {/* Removemos a classe 'truncate' e adicionamos 'break-words' */}
+                      <p className="font-semibold group-hover:underline break-words">{book.title}</p>
+                      <p className="text-sm text-muted-foreground truncate">{book.author}</p>
                       <div className="flex items-center gap-2">
                         <Progress value={progress} className="w-full" />
                         <span className="text-xs text-muted-foreground">{progress}%</span>

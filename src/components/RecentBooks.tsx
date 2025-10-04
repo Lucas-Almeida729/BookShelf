@@ -21,7 +21,7 @@ export default function RecentBooks({ recentBooks }: RecentBooksProps) {
       </CardHeader>
       <CardContent>
         {recentBooks.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
             {recentBooks.map((book) => (
               <Link href={`/livros/${book.id}`} key={book.id} className="group">
                 <div className="aspect-[2/3] relative">

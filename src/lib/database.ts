@@ -31,31 +31,18 @@ export interface UpdateBookData extends Partial<CreateBookData> {
 
 // Interface para os filtros
 export interface BookFilters {
-  query?: string;
   genre?: string;
-  status?: string;
 }
 
 
 // --- Funções de CRUD para Livros ---
 
 export async function getBooks(filters: BookFilters = {}) {
-  const { query, genre, status } = filters;
+  const { genre } = filters;
   const where: any = {};
-
-  if (query) {
-    where.OR = [
-      { title: { contains: query } },
-      { author: { contains: query } },
-    ];
-  }
 
   if (genre && genre !== 'ALL') {
     where.genre = genre;
-  }
-
-  if (status && status !== 'ALL') {
-    where.status = status;
   }
 
   return await prisma.book.findMany({
@@ -106,7 +93,7 @@ export async function getGenres() {
 
 // VERSÃO ATUALIZADA DA FUNÇÃO getBookStats
 export async function getBookStats() {
-  // Executa todas as consultas ao banco de dados em paralelo para melhor performance
+  // Executa todas as consultas ao banco de dados em paralelo
   const [
     totalBooks,
     booksRead,
@@ -114,8 +101,10 @@ export async function getBookStats() {
     booksToRead,
     booksPaused,
     booksAbandoned,
-    sumOfReadPages,      // Soma das páginas dos livros LIDOS
-    sumOfReadingProgress // Soma das páginas atuais dos livros LENDO
+    sumOfReadPages,
+    sumOfReadingProgress,
+    sumOfPausedProgress,   // Novo
+    sumOfAbandonedProgress // Novo
   ] = await Promise.all([
     prisma.book.count(),
     prisma.book.count({ where: { status: 'LIDO' } }),
@@ -123,26 +112,40 @@ export async function getBookStats() {
     prisma.book.count({ where: { status: 'QUERO_LER' } }),
     prisma.book.count({ where: { status: 'PAUSADO' } }),
     prisma.book.count({ where: { status: 'ABANDONADO' } }),
-    // Consulta 1: Soma o total de páginas de todos os livros com status 'LIDO'
+    // Soma as páginas de livros 'LIDO'
     prisma.book.aggregate({
       _sum: { pages: true },
       where: { status: 'LIDO' },
     }),
-    // Consulta 2: Soma a página atual de todos os livros com status 'LENDO'
+    // Soma as páginas atuais de livros 'LENDO'
     prisma.book.aggregate({
       _sum: { currentPage: true },
       where: { status: 'LENDO' },
     }),
+    // AQUI ESTÁ A MUDANÇA: Soma as páginas atuais de livros 'PAUSADO'
+    prisma.book.aggregate({
+      _sum: { currentPage: true },
+      where: { status: 'PAUSADO' },
+    }),
+    // AQUI ESTÁ A MUDANÇA: Soma as páginas atuais de livros 'ABANDONADO'
+    prisma.book.aggregate({
+      _sum: { currentPage: true },
+      where: { status: 'ABANDONADO' },
+    }),
   ]);
 
-  // Combina os dois resultados para o total de páginas lidas
-  const totalPagesRead = (sumOfReadPages._sum.pages ?? 0) + (sumOfReadingProgress._sum.currentPage ?? 0);
+  // Combina todos os resultados para o total de páginas lidas
+  const totalPagesRead = 
+    (sumOfReadPages._sum.pages ?? 0) + 
+    (sumOfReadingProgress._sum.currentPage ?? 0) +
+    (sumOfPausedProgress._sum.currentPage ?? 0) +
+    (sumOfAbandonedProgress._sum.currentPage ?? 0);
 
   return {
     totalBooks,
     booksRead,
     booksReading,
-    pagesRead: totalPagesRead, // Usa o novo valor combinado
+    pagesRead: totalPagesRead,
     booksToRead,
     booksPaused,
     booksAbandoned,
