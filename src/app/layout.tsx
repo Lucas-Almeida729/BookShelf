@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer"; // 1. Importar o novo componente Footer
+import Footer from "@/components/Footer";
 import { ThemeProvider } from "@/components/ThemeProvider";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -20,15 +20,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
-      {/* 2. Adicionar classes para garantir que o rodapé fique no fundo */}
       <body className={`${inter.className} flex flex-col min-h-screen`}>
         <ThemeProvider>
           <Navbar />
-          {/* 3. A classe 'flex-grow' faz o conteúdo principal expandir e empurrar o rodapé para baixo */}
-          <main className="pt-20 flex-grow">
+          {/* AQUI ESTÁ A CORREÇÃO FINAL:
+            - pt-32: Adiciona um espaçamento grande no topo para ecrãs pequenos (mobile).
+            - md:pt-24: Em ecrãs de tamanho médio para cima, o espaçamento diminui.
+          */}
+          <main className="flex-grow pt-32 md:pt-24">
             {children}
           </main>
-          <Footer /> {/* 4. Adicionar o componente Footer aqui */}
+          <Footer />
         </ThemeProvider>
       </body>
     </html>

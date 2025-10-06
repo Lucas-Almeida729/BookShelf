@@ -10,9 +10,13 @@ export default function Navbar() {
   const pathname = usePathname();
 
   return (
-    // AQUI ESTÁ A ALTERAÇÃO: Adicionamos as classes para fixar a barra
     <nav className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-4 shadow-md border-b z-50">
-      <div className="container mx-auto flex justify-between items-center">
+      {/* A MUDANÇA: 
+        - Adicionamos 'flex-wrap' para permitir que os itens quebrem para a linha de baixo.
+        - 'justify-center' alinha tudo ao centro em telas pequenas.
+        - 'md:justify-between' volta a alinhar os itens nas extremidades em telas médias e maiores.
+      */}
+      <div className="container mx-auto flex justify-center md:justify-between items-center flex-wrap gap-4 md:gap-0">
         <Link
           href="/"
           className="text-2xl font-bold tracking-tight text-blue-600 dark:text-blue-400"
