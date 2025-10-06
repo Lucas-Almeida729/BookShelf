@@ -53,8 +53,8 @@ export default async function BibliotecaPage({
   const orderedStatuses = [
     "LENDO",
     "QUERO_LER",
-    "LIDO",
     "PAUSADO",
+    "LIDO",
     "ABANDONADO",
   ];
 

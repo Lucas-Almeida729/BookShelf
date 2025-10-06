@@ -1,8 +1,8 @@
 // src/components/StatsCards.tsx
 
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
-  BookOpen, 
   BookCheck, 
   Glasses, 
   Book, 
@@ -16,86 +16,74 @@ interface StatsCardsProps {
     totalBooks: number;
     booksRead: number;
     booksReading: number;
-    pagesRead: number;
     booksToRead: number;
     booksPaused: number;
     booksAbandoned: number;
   };
 }
 
+// Componente auxiliar para os cards de status
+const StatCard = ({ href, title, icon: Icon, value, description }: { href: string, title: string, icon: React.ElementType, value: string | number, description: string }) => (
+  <Link href={href} className="group">
+    <Card className="transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        <Icon className="h-4 w-4 text-muted-foreground" />
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold">{value}</div>
+        <p className="text-xs text-muted-foreground">{description}</p>
+      </CardContent>
+    </Card>
+  </Link>
+);
+
+// Este componente agora renderiza apenas a grelha de 6 cards
 export default function StatsCards({ stats }: StatsCardsProps) {
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total de Livros</CardTitle>
-          <Book className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{stats.totalBooks}</div>
-          <p className="text-xs text-muted-foreground">livros na sua estante</p>
-        </CardContent>
-      </Card>
-            <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Páginas Lidas</CardTitle>
-          <BookOpen className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{stats.pagesRead.toLocaleString('pt-BR')}</div>
-          <p className="text-xs text-muted-foreground">total de páginas lidas</p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Livros Lidos</CardTitle>
-          <BookCheck className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{stats.booksRead}</div>
-          <p className="text-xs text-muted-foreground">livros concluídos</p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Lendo Atualmente</CardTitle>
-          <Glasses className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{stats.booksReading}</div>
-          <p className="text-xs text-muted-foreground">livros em andamento</p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Quero_Ler</CardTitle>
-          <BookmarkPlus className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{stats.booksToRead}</div>
-          <p className="text-xs text-muted-foreground">livros na sua lista</p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Pausados</CardTitle>
-          <PauseCircle className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{stats.booksPaused}</div>
-          <p className="text-xs text-muted-foreground">livros em pausa</p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Abandonados</CardTitle>
-          <XCircle className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{stats.booksAbandoned}</div>
-          <p className="text-xs text-muted-foreground">livros abandonados</p>
-        </CardContent>
-      </Card>
+    <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+      <StatCard 
+        href="/biblioteca"
+        title="Total de Livros"
+        icon={Book}
+        value={stats.totalBooks}
+        description="livros na sua estante"
+      />
+      <StatCard 
+        href="/biblioteca?status=LENDO"
+        title="Lendo Atualmente"
+        icon={Glasses}
+        value={stats.booksReading}
+        description="livros em andamento"
+      />
+      <StatCard 
+        href="/biblioteca?status=LIDO"
+        title="Livros Lidos"
+        icon={BookCheck}
+        value={stats.booksRead}
+        description="livros concluídos"
+      />
+      <StatCard 
+        href="/biblioteca?status=QUERO_LER"
+        title="Quero Ler"
+        icon={BookmarkPlus}
+        value={stats.booksToRead}
+        description="livros na sua lista"
+      />
+      <StatCard 
+        href="/biblioteca?status=PAUSADO"
+        title="Pausados"
+        icon={PauseCircle}
+        value={stats.booksPaused}
+        description="leituras em pausa"
+      />
+      <StatCard 
+        href="/biblioteca?status=ABANDONADO"
+        title="Abandonados"
+        icon={XCircle}
+        value={stats.booksAbandoned}
+        description="leituras abandonadas"
+      />
     </div>
   );
 }
