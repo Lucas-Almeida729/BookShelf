@@ -6,8 +6,8 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import DeleteBookButton from '@/components/DeleteBookButton';
-import { Progress } from '@/components/ui/progress'; // 1. Importar o componente de progresso
-import UpdateProgressForm from '@/components/UpdateProgressForm'; // 2. Importar o novo formulário
+import { Progress } from '@/components/ui/progress';
+import UpdateProgressForm from '@/components/UpdateProgressForm';
 
 export default async function BookDetailsPage({ params }: { params: { id: string } }) {
   const book = await getBook(params.id);
@@ -16,14 +16,12 @@ export default async function BookDetailsPage({ params }: { params: { id: string
     notFound();
   }
   
-  // Calcula o progresso
   const progressPercentage = (book.pages && book.currentPage)
     ? Math.round((book.currentPage / book.pages) * 100)
     : 0;
 
   return (
     <div className="container mx-auto p-4">
-      {/* Botões de Ação */}
       <div className="flex justify-end gap-2 mb-4">
         <Button asChild variant="outline">
           <Link href={`/livros/${book.id}/editar`}>Editar</Link>
@@ -32,7 +30,6 @@ export default async function BookDetailsPage({ params }: { params: { id: string
       </div>
 
       <div className="grid md:grid-cols-3 gap-6">
-        {/* Imagem da Capa */}
         <div className="md:col-span-1">
           {book.cover ? (
             <Image
@@ -49,7 +46,6 @@ export default async function BookDetailsPage({ params }: { params: { id: string
           )}
         </div>
 
-        {/* Detalhes do Livro */}
         <div className="md:col-span-2">
           <h1 className="text-4xl font-bold mb-2">{book.title}</h1>
           <h2 className="text-2xl text-gray-600 mb-4">{book.author}</h2>
@@ -61,8 +57,8 @@ export default async function BookDetailsPage({ params }: { params: { id: string
             <p><strong>Status:</strong> {book.status.replace(/_/g, ' ')}</p>
           </div>
 
-          {/* 3. Seção de Progresso (aparece apenas se o status for "LENDO") */}
-          {book.status === 'LENDO' && book.pages && book.pages > 0 && (
+          {/* Seção de Progresso - Aparecerá se o livro tiver páginas */}
+          {book.pages && book.pages > 0 && (
             <div className="my-6 p-4 border rounded-lg">
               <h3 className="text-lg font-semibold mb-2">Progresso da Leitura</h3>
               <div className="flex items-center gap-4 mb-2">

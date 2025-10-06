@@ -5,9 +5,9 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { createBook, updateBook, deleteBook } from "./database";
+// Importamos a função getBook para poder verificar o status antigo do livro
+import { createBook, updateBook, deleteBook, getBook } from "./database";
 
-// Define um "esquema" ou "molde" para validar os dados do formulário
 const BookSchema = z.object({
   id: z.string().optional(),
   title: z.string().min(1, "Título é obrigatório"),
@@ -22,13 +22,11 @@ const BookSchema = z.object({
   rating: z.coerce.number().optional(),
 });
 
-// --- NOVA VALIDAÇÃO PARA O PROGRESSO ---
 const ProgressSchema = z.object({
   bookId: z.string(),
   currentPage: z.coerce.number().min(0, "A página não pode ser negativa."),
 });
 
-// --- AÇÕES DE LIVRO (CRUD) ---
 
 export async function createBookAction(formData: FormData) {
   const rawData = Object.fromEntries(formData.entries());
@@ -50,6 +48,7 @@ export async function createBookAction(formData: FormData) {
   redirect("/biblioteca");
 }
 
+// --- VERSÃO ATUALIZADA DA AÇÃO DE UPDATE ---
 export async function updateBookAction(formData: FormData) {
   const rawData = Object.fromEntries(formData.entries());
 
@@ -65,8 +64,31 @@ export async function updateBookAction(formData: FormData) {
     throw new Error("ID do livro não encontrado para atualização.");
   }
   
+  // 1. Busca o estado atual do livro no banco de dados ANTES de atualizar
+  const existingBook = await getBook(id);
+  if (!existingBook) {
+    throw new Error("Livro não encontrado para atualização.");
+  }
+
+  // Prepara os dados para a atualização
+  const dataToUpdate: any = { ...bookData };
+
+  // 2. Aplica a nova lógica de progresso
+  const newStatus = dataToUpdate.status;
+  const oldStatus = existingBook.status;
+
+  // Se o livro foi movido PARA "LIDO"
+  if (newStatus === 'LIDO' && oldStatus !== 'LIDO') {
+    dataToUpdate.currentPage = dataToUpdate.pages || existingBook.pages;
+  } 
+  // Se o livro foi movido DE "LIDO" para outro status
+  else if (oldStatus === 'LIDO' && newStatus !== 'LIDO') {
+    dataToUpdate.currentPage = 0;
+  }
+
+  // 3. Salva os dados atualizados no banco
   try {
-    await updateBook(id, bookData);
+    await updateBook(id, dataToUpdate);
   } catch (error) {
     console.error(error);
     throw new Error("Falha ao atualizar o livro no banco de dados.");
@@ -76,6 +98,7 @@ export async function updateBookAction(formData: FormData) {
   revalidatePath(`/livros/${id}`);
   redirect(`/livros/${id}`);
 }
+
 
 export async function deleteBookAction(id: string) {
     if (!id) {
@@ -94,15 +117,12 @@ export async function deleteBookAction(id: string) {
 }
 
 
-// --- NOVA SERVER ACTION PARA ATUALIZAR O PROGRESSO ---
-
 export async function updateBookProgressAction(formData: FormData) {
   const rawData = Object.fromEntries(formData.entries());
   const validatedFields = ProgressSchema.safeParse(rawData);
 
   if (!validatedFields.success) {
     console.error(validatedFields.error);
-    // Em uma aplicação real, você poderia retornar uma mensagem de erro para o usuário
     throw new Error("Dados de progresso inválidos.");
   }
   
@@ -115,7 +135,6 @@ export async function updateBookProgressAction(formData: FormData) {
     throw new Error("Falha ao atualizar o progresso no banco de dados.");
   }
 
-  // Revalida o cache para que a página do livro e o dashboard mostrem o novo progresso
   revalidatePath(`/livros/${bookId}`);
   revalidatePath('/');
 }

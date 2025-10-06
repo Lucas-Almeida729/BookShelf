@@ -46,7 +46,7 @@ export function BookCard({ book, onDelete }: BookCardProps) {
           <h3 className="font-semibold text-sm leading-tight line-clamp-2">
             {book.title}
           </h3>
-          <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
+          <p className="text-xs text-muted-foreground mt-2 line-clamp-1">
             {book.author}
           </p>
 

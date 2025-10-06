@@ -51,8 +51,8 @@ export default async function BibliotecaPage({
 
   // Define a ordem desejada para as seções
   const orderedStatuses = [
-    "QUERO_LER",
     "LENDO",
+    "QUERO_LER",
     "LIDO",
     "PAUSADO",
     "ABANDONADO",
