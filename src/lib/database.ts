@@ -2,7 +2,7 @@
 import { prisma } from './prisma'
 import { Book, Genre } from '@prisma/client'
 
-// Tipos...
+// Tipos
 export type ReadingStatus = 'QUERO_LER' | 'LENDO' | 'LIDO' | 'PAUSADO' | 'ABANDONADO'
 
 export interface BookWithGenre extends Book {
@@ -29,20 +29,26 @@ export interface UpdateBookData extends Partial<CreateBookData> {
   id: string
 }
 
-// Interface para os filtros
 export interface BookFilters {
   genre?: string;
+  query?: string;
 }
-
 
 // --- Funções de CRUD para Livros ---
 
 export async function getBooks(filters: BookFilters = {}) {
-  const { genre } = filters;
+  const { genre, query } = filters;
   const where: any = {};
 
   if (genre && genre !== 'ALL') {
     where.genre = genre;
+  }
+
+  if (query) {
+    where.OR = [
+      { title: { contains: query } },
+      { author: { contains: query } },
+    ];
   }
 
   return await prisma.book.findMany({
@@ -50,7 +56,6 @@ export async function getBooks(filters: BookFilters = {}) {
     orderBy: { createdAt: 'desc' },
   });
 }
-
 
 export async function getBook(id: string) {
   return await prisma.book.findUnique({ where: { id } })
@@ -69,7 +74,7 @@ export async function deleteBook(id: string) {
   return await prisma.book.delete({ where: { id } })
 }
 
-// --- Funções de Gêneros ---
+// --- FUNÇÃO getGenres RESTAURADA ---
 export async function getGenres() {
   const distinctGenres = await prisma.book.findMany({
     where: {
@@ -91,10 +96,8 @@ export async function getGenres() {
 
 // --- Funções para o Dashboard ---
 
-// VERSÃO ATUALIZADA DA FUNÇÃO getBookStats
 export async function getBookStats() {
-  // Executa todas as consultas ao banco de dados em paralelo
-  const [
+    const [
     totalBooks,
     booksRead,
     booksReading,
@@ -103,8 +106,8 @@ export async function getBookStats() {
     booksAbandoned,
     sumOfReadPages,
     sumOfReadingProgress,
-    sumOfPausedProgress,   // Novo
-    sumOfAbandonedProgress // Novo
+    sumOfPausedProgress,
+    sumOfAbandonedProgress
   ] = await Promise.all([
     prisma.book.count(),
     prisma.book.count({ where: { status: 'LIDO' } }),
@@ -112,29 +115,24 @@ export async function getBookStats() {
     prisma.book.count({ where: { status: 'QUERO_LER' } }),
     prisma.book.count({ where: { status: 'PAUSADO' } }),
     prisma.book.count({ where: { status: 'ABANDONADO' } }),
-    // Soma as páginas de livros 'LIDO'
     prisma.book.aggregate({
       _sum: { pages: true },
       where: { status: 'LIDO' },
     }),
-    // Soma as páginas atuais de livros 'LENDO'
     prisma.book.aggregate({
       _sum: { currentPage: true },
       where: { status: 'LENDO' },
     }),
-    // AQUI ESTÁ A MUDANÇA: Soma as páginas atuais de livros 'PAUSADO'
     prisma.book.aggregate({
       _sum: { currentPage: true },
       where: { status: 'PAUSADO' },
     }),
-    // AQUI ESTÁ A MUDANÇA: Soma as páginas atuais de livros 'ABANDONADO'
     prisma.book.aggregate({
       _sum: { currentPage: true },
       where: { status: 'ABANDONADO' },
     }),
   ]);
 
-  // Combina todos os resultados para o total de páginas lidas
   const totalPagesRead = 
     (sumOfReadPages._sum.pages ?? 0) + 
     (sumOfReadingProgress._sum.currentPage ?? 0) +
