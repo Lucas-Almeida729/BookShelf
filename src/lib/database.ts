@@ -1,5 +1,5 @@
 // src/lib/database.ts
-import { prisma } from './prisma'
+import { prisma, Prisma } from './prisma'
 import { Book, Genre } from '@prisma/client'
 
 // Tipos
@@ -32,23 +32,28 @@ export interface UpdateBookData extends Partial<CreateBookData> {
 export interface BookFilters {
   genre?: string;
   query?: string;
+  status?: string;
 }
 
 // --- Funções de CRUD para Livros ---
 
 export async function getBooks(filters: BookFilters = {}) {
-  const { genre, query } = filters;
-  const where: any = {};
-
-  if (genre && genre !== 'ALL') {
-    where.genre = genre;
-  }
+  const { query, genre, status } = filters;
+  const where: Prisma.BookWhereInput = {};
 
   if (query) {
     where.OR = [
       { title: { contains: query } },
       { author: { contains: query } },
     ];
+  }
+
+  if (genre && genre !== 'ALL') {
+    where.genre = genre;
+  }
+
+  if (status && status !== 'ALL') {
+    where.status = status;
   }
 
   return await prisma.book.findMany({
@@ -65,16 +70,17 @@ export async function createBook(data: CreateBookData) {
   return await prisma.book.create({ data })
 }
 
-export async function updateBook(id: string, data: UpdateBookData) {
-  const { id: _, ...updateData } = data
-  return await prisma.book.update({ where: { id }, data: updateData })
+export async function updateBook(id: string, data: Partial<UpdateBookData>) {
+  return await prisma.book.update({ where: { id }, data })
 }
 
+// --- FUNÇÃO deleteBook RESTAURADA ---
 export async function deleteBook(id: string) {
   return await prisma.book.delete({ where: { id } })
 }
 
-// --- FUNÇÃO getGenres RESTAURADA ---
+
+// --- Funções de Gêneros ---
 export async function getGenres() {
   const distinctGenres = await prisma.book.findMany({
     where: {

@@ -8,7 +8,8 @@ export const statuses = [
   "ABANDONADO",
 ] as const;
 
-export let genres = [
+// CORREÇÃO: Trocar 'let' por 'const'
+export const genres = [
   "Literatura Brasileira",
   "Ficção Científica",
   "Realismo Mágico",

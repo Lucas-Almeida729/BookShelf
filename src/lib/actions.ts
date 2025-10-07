@@ -5,8 +5,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-// Importamos a função getBook para poder verificar o status antigo do livro
-import { createBook, updateBook, deleteBook, getBook } from "./database";
+// Importar o tipo 'UpdateBookData' para tipagem correta
+import { createBook, updateBook, deleteBook, getBook, UpdateBookData } from "./database";
 
 const BookSchema = z.object({
   id: z.string().optional(),
@@ -48,7 +48,6 @@ export async function createBookAction(formData: FormData) {
   redirect("/biblioteca");
 }
 
-// --- VERSÃO ATUALIZADA DA AÇÃO DE UPDATE ---
 export async function updateBookAction(formData: FormData) {
   const rawData = Object.fromEntries(formData.entries());
 
@@ -64,29 +63,24 @@ export async function updateBookAction(formData: FormData) {
     throw new Error("ID do livro não encontrado para atualização.");
   }
   
-  // 1. Busca o estado atual do livro no banco de dados ANTES de atualizar
   const existingBook = await getBook(id);
   if (!existingBook) {
     throw new Error("Livro não encontrado para atualização.");
   }
 
-  // Prepara os dados para a atualização
-  const dataToUpdate: any = { ...bookData };
+  // CORREÇÃO: Usar o tipo 'Partial<UpdateBookData>' em vez de 'any'
+  const dataToUpdate: Partial<UpdateBookData> = { ...bookData };
 
-  // 2. Aplica a nova lógica de progresso
   const newStatus = dataToUpdate.status;
   const oldStatus = existingBook.status;
 
-  // Se o livro foi movido PARA "LIDO"
   if (newStatus === 'LIDO' && oldStatus !== 'LIDO') {
     dataToUpdate.currentPage = dataToUpdate.pages || existingBook.pages;
   } 
-  // Se o livro foi movido DE "LIDO" para outro status
   else if (oldStatus === 'LIDO' && newStatus !== 'LIDO') {
     dataToUpdate.currentPage = 0;
   }
 
-  // 3. Salva os dados atualizados no banco
   try {
     await updateBook(id, dataToUpdate);
   } catch (error) {
