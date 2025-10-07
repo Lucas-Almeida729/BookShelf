@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { BookCard } from "@/components/BookCard";
 import { getBooks, getGenres } from "@/lib/database";
 import { Book } from "@prisma/client";
-import GenreFilter from "@/components/GenreFilter"; // 1. Importar o novo componente
+import GenreFilter from "@/components/GenreFilter";
+import { BookSearch } from "@/components/BookSearch"; // Importar o novo componente de pesquisa
 
 // Componente auxiliar para renderizar uma seção de livros
 const BookSection = ({ title, books }: { title: string; books: Book[] }) => {
@@ -25,17 +26,17 @@ const BookSection = ({ title, books }: { title: string; books: Book[] }) => {
   );
 };
 
-// 2. Adicionar 'searchParams' às props da página
 export default async function BibliotecaPage({
   searchParams,
 }: {
   searchParams?: {
     genre?: string;
+    query?: string; // Adicionar o parâmetro query aqui
   };
 }) {
-  // 3. Buscar os livros e gêneros em paralelo, passando os filtros
+  // Buscar os livros e gêneros em paralelo, passando os filtros
   const [allBooks, genres] = await Promise.all([
-    getBooks(searchParams), // Passa o filtro de gênero para a busca
+    getBooks(searchParams), // Passa o filtro de gênero E a query para a busca
     getGenres(),
   ]);
 
@@ -67,8 +68,11 @@ export default async function BibliotecaPage({
         </Button>
       </div>
 
-      {/* 4. Renderizar o componente de filtro */}
-      <GenreFilter genres={genres} />
+      {/* Contêiner para a barra de pesquisa e o filtro de gênero */}
+      <div className="flex items-center gap-4 mb-4">
+        <BookSearch /> {/* Renderizar o componente de pesquisa */}
+        <GenreFilter genres={genres} />
+      </div>
 
       {allBooks.length === 0 ? (
         <p className="text-center text-muted-foreground mt-10">

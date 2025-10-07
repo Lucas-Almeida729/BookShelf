@@ -17,39 +17,39 @@ export function BookCard({ book }: BookCardProps) {
   const deleteAction = deleteBookAction.bind(null, book.id);
 
   return (
-    <Card className="group flex overflow-hidden rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:scale-[1.02]">
+    <Card className="group flex flex-col overflow-hidden rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:scale-[1.02]">
       
-      {/* Coluna da Imagem (Esquerda) - Estrutura Corrigida e Definitiva */}
-      <Link href={`/livros/${book.id}`} className="block w-24 flex-shrink-0 md:w-28">
-        <div className="relative aspect-[3/4] w-full">
+      {/* Coluna da Imagem (Topo) */}
+      <Link href={`/livros/${book.id}`} className="block w-full flex-shrink-0">
+        <div className="relative aspect-[3/4] w-full mx-auto max-w-[150px]"> {/* Ajuste de largura e centralização */}
           {book.cover ? (
             <Image
               src={book.cover}
               alt={book.title}
               fill
-              className="object-cover"
-              sizes="112px"
+              className="object-cover rounded-t-lg" // Adicionado rounded-t-lg para cantos arredondados
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted to-muted/50">
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted to-muted/50 rounded-t-lg">
               <BookOpen className="h-8 w-8 text-muted-foreground" />
             </div>
           )}
         </div>
       </Link>
 
-      {/* Coluna de Conteúdo (Direita) */}
-      <div className="relative flex min-w-0 flex-grow flex-col p-3">
+      {/* Coluna de Conteúdo (Abaixo da Imagem) */}
+      <div className="relative flex min-w-0 flex-grow flex-col p-3 pt-2">
         <div
-          className={`absolute top-2 left-2 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium text-white ${getStatusColor(
+          className={`absolute -top-3 left-1/2 -translate-x-1/2 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium text-white ${getStatusColor(
             book.status
-          )}`}
+          )} z-10`}
         >
           {getStatusLabel(book.status)}
         </div>
 
         <Link href={`/livros/${book.id}`} className="flex-grow">
-          <h3 className="mt-7 line-clamp-2 text-sm font-semibold leading-tight">
+          <h3 className="mt-4 line-clamp-2 text-sm font-semibold leading-tight">
             {book.title}
           </h3>
           <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">

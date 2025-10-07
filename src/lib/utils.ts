@@ -1,8 +1,9 @@
-// src/lib/utils.ts (VERSÃO CORRIGIDA)
+"use client";
 
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { ReadingStatus } from "./database";
+import { useRef, useCallback } from 'react';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -51,3 +52,19 @@ export const getReadingProgress = (currentPage: number | null | undefined, total
   }
   return 0;
 };
+
+export function useDebouncedCallback<F extends (...args: any[]) => any>(
+  callback: F,
+  delay: number
+): (...args: Parameters<F>) => void {
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  return useCallback((...args: Parameters<F>) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(() => {
+      callback(...args);
+    }, delay);
+  }, [callback, delay]);
+}

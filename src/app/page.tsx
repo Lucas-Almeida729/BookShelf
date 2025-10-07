@@ -46,7 +46,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* --- LINHA INFERIOR (Adicionados Recentemente e Progresso) --- */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2">
           <RecentBooks recentBooks={recentBooks} />
         </div>
